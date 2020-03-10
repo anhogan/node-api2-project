@@ -21,24 +21,29 @@ router.post('/', (req, res) => {
   };
 });
 
-// Fix 404 error - works otherwise
 router.post('/:id/comments', (req, res) => {
   if (!req.body.text) {
     res.status(400).json({ errorMessage: "Please provide text for the comment." });
   } else {
-    Posts.insertComment(req.body)
-      .then(comment => {
-        console.log(req.body.post_id);
-        if (comment) {
+    Posts.findById(req.params.id)
+    .then(post => {
+      if (post.length === 0) {
+        res.status(404).json({ message: "The post with the specified ID does not exist." });
+      } else {
+        Posts.insertComment(req.body)
+        .then(comment => {
           res.status(201).json({ message: "The comment was successfully created." });
-        } else {
-          res.status(404).json({ message: "The post with the specified ID does not exist." });
-        };
-      })
-      .catch(error => {
-        console.log(error);
-        res.status(500).json({ error: "There was an error while saving the comment to the database" });
-      });
+        })
+        .catch(error => {
+          console.log(error);
+          res.status(500).json({ error: "There was an error while saving the comment to the database" });
+        });
+      };
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({ error: "The post information could not be retrieved." });
+    });
   };
 });
 
