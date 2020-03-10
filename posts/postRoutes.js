@@ -11,6 +11,7 @@ router.post('/', (req, res) => {
   } else {
     Posts.insert(req.body)
     .then(posts => {
+      console.log(posts);
       res.status(201).json({ message: "The post was successfully created." });
     })
     .catch(error => {
@@ -26,11 +27,12 @@ router.post('/:id/comments', (req, res) => {
     res.status(400).json({ errorMessage: "Please provide text for the comment." });
   } else {
     Posts.insertComment(req.body)
-      .then(commentId => {
-        if (!commentId) {
-          res.status(404).json({ message: "The post with the specified ID does not exist." });
-        } else {
+      .then(comment => {
+        console.log(req.body.post_id);
+        if (comment) {
           res.status(201).json({ message: "The comment was successfully created." });
+        } else {
+          res.status(404).json({ message: "The post with the specified ID does not exist." });
         };
       })
       .catch(error => {
@@ -54,7 +56,6 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   Posts.findById(req.params.id)
     .then(post => {
-      console.log(post);
       if (post.length === 0) {
         res.status(404).json({ message: "The post with the specified ID does not exist." });
       } else {
@@ -70,7 +71,6 @@ router.get('/:id', (req, res) => {
 router.get('/:id/comments', (req, res) => {
   Posts.findPostComments(req.params.id)
     .then(postComments => {
-      console.log(postComments);
       if (postComments.length > 0) {
         res.status(200).json(postComments);
       } else {
