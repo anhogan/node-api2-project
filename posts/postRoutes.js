@@ -110,7 +110,15 @@ router.put('/:id', (req, res) => {
     Posts.update(req.params.id, req.body)
       .then(count => {
         if (count > 0) {
-          res.status(200).json({ message: "The post was successfully modified" });
+          // res.status(200).json({ message: "The post was successfully modified" });
+          Posts.find()
+            .then(posts => {
+              res.status(200).json(posts);
+            })
+            .catch(error => {
+              console.log(error);
+              res.status(500).json({ error: "The posts information could not be retrieved." });
+            });
         } else {
           res.status(404).json({ message: "The post with the specified ID does not exist." });
         };
