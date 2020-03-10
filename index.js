@@ -1,9 +1,5 @@
-const express = require('express');
+const server = require('./api/server');
 
-const postRoutes = require('./posts/postRoutes');
+const PORT = 5000;
 
-const server = express();
-
-server.use('/posts', postRoutes);
-
-server.listen(5000, () => console.log('API running on port 5000'));
+server.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
