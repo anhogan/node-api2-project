@@ -5,7 +5,6 @@ const Posts = require('../data/db');
 const router = express.Router();
 
 // Routes chained off of base /api/posts
-
 router.post('/', (req, res) => {
   if (!req.body.title || !req.body.contents) {
     res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
@@ -21,6 +20,7 @@ router.post('/', (req, res) => {
   };
 });
 
+// Fix 404 error - works otherwise
 router.post('/:id/comments', (req, res) => {
   if (!req.body.text) {
     res.status(400).json({ errorMessage: "Please provide text for the comment." });
@@ -51,6 +51,7 @@ router.get('/', (req, res) => {
     });
 });
 
+// Fix 404 error - works otherwise
 router.get('/:id', (req, res) => {
   Posts.findById(req.params.id)
     .then(post => {
@@ -66,6 +67,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// Fix 404 error - works otherwise
 router.get('/:id/comments', (req, res) => {
   Posts.findPostComments(req.params.id)
     .then(post => {
@@ -101,9 +103,9 @@ router.put('/:id', (req, res) => {
     res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
   } else {
     Posts.update(req.params.id, req.body)
-      .then(updatedPost => {
-        if (updatedPost) {
-          res.status(200).json(updatedPost);
+      .then(count => {
+        if (count > 0) {
+          res.status(200).json({ message: "The post was successfully modified" });
         } else {
           res.status(404).json({ message: "The post with the specified ID does not exist." });
         };
