@@ -11,7 +11,7 @@ router.post('/', (req, res) => {
   } else {
     Posts.insert(req.body)
     .then(posts => {
-      res.status(201).json(posts);
+      res.status(201).json({ message: "The post was successfully created." });
     })
     .catch(error => {
       console.log(error);
@@ -26,17 +26,17 @@ router.post('/:id/comments', (req, res) => {
     res.status(400).json({ errorMessage: "Please provide text for the comment." });
   } else {
     Posts.insertComment(req.body)
-    .then(post => {
-      if (post) {
-        res.status(201).json(post);
-      } else {
-        res.status(404).json({ message: "The post with the specified ID does not exist." });
-      };
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(500).json({ error: "There was an error while saving the comment to the database" });
-    });
+      .then(commentId => {
+        if (!commentId) {
+          res.status(404).json({ message: "The post with the specified ID does not exist." });
+        } else {
+          res.status(201).json({ message: "The comment was successfully created." });
+        };
+      })
+      .catch(error => {
+        console.log(error);
+        res.status(500).json({ error: "There was an error while saving the comment to the database" });
+      });
   };
 });
 
@@ -51,14 +51,14 @@ router.get('/', (req, res) => {
     });
 });
 
-// Fix 404 error - works otherwise
 router.get('/:id', (req, res) => {
   Posts.findById(req.params.id)
     .then(post => {
-      if (post) {
-        res.status(200).json(post);
-      } else {
+      console.log(post);
+      if (post.length === 0) {
         res.status(404).json({ message: "The post with the specified ID does not exist." });
+      } else {
+        res.status(200).json(post);
       };
     })
     .catch(error => {
@@ -67,12 +67,12 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// Fix 404 error - works otherwise
 router.get('/:id/comments', (req, res) => {
   Posts.findPostComments(req.params.id)
-    .then(post => {
-      if (post) {
-        res.status(200).json(post);
+    .then(postComments => {
+      console.log(postComments);
+      if (postComments.length > 0) {
+        res.status(200).json(postComments);
       } else {
         res.status(404).json({ message: "The post with the specified ID does not exist." });
       };
